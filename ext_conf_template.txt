@@ -1,0 +1,29 @@
+# cat=access/enable/10; type=options[Sandbox (CIE)=sandbox,Production=production]; label=Environment: Which UPS environment to call. Sandbox uses UPS Customer Integration Environment (wwwcie.ups.com).
+environment = sandbox
+
+# cat=access/enable/20; type=string; label=OAuth client ID: UPS OAuth 2.0 client id. System-wide default; a site may override it.
+clientId =
+
+# cat=access/enable/30; type=string; label=OAuth client secret: UPS OAuth 2.0 client secret. Kept out of version control; stored in the Install Tool.
+clientSecret =
+
+# cat=access/enable/40; type=string; label=Account number: Six-character UPS account (shipper) number. Optional for published rates, required for negotiated rates.
+accountNumber =
+
+# cat=origin/dims/10; type=string; label=Origin postal code: Postal code the shipment is sent from.
+originPostCode =
+
+# cat=origin/dims/20; type=string; label=Origin country code: ISO 3166-1 alpha-2 country the shipment is sent from.
+originCountryCode = DE
+
+# cat=origin/dims/30; type=string; label=Origin city: Optional city the shipment is sent from.
+originCity =
+
+# cat=services/enable/10; type=string; label=Used service codes: Comma-separated UPS service codes to offer (empty = every service UPS returns).
+usedServices =
+
+# cat=services/enable/20; type=options[Kilograms=KGS,Pounds=LBS]; label=Weight unit: Unit the basket weight is sent to UPS in.
+weightUnit = KGS
+
+# cat=advanced/enable/10; type=string; label=API base URL override: Advanced. Overrides the environment's UPS API base URL, e.g. a proxy or a local mock server. Leave empty to use the environment's default.
+apiBaseUrl =

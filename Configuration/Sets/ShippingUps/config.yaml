@@ -1,0 +1,4 @@
+name: goldene-zeiten/products-shipping-ups
+label: Products UPS Shipping
+dependencies:
+  - goldene-zeiten/products-core

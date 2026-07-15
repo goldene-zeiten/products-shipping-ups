@@ -1,0 +1,45 @@
+{
+  "name": "goldene-zeiten/products-shipping-ups",
+  "description": "Live UPS shipping rates for the Products TYPO3 shop system",
+  "type": "typo3-cms-extension",
+  "license": [
+    "GPL-2.0-or-later"
+  ],
+  "require": {
+    "php": "^8.2 || ^8.3 || ^8.4 || ^8.5",
+    "ext-json": "*",
+    "goldene-zeiten/products-core": "^1.0",
+    "psr/http-client": "^1.0",
+    "psr/http-message": "^1.1 || ^2.0",
+    "typo3/cms-core": "^13.4 || ^14.3"
+  },
+  "autoload": {
+    "psr-4": {
+      "GoldeneZeiten\\Products\\Shipping\\Ups\\": "Classes/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "GoldeneZeiten\\Products\\Shipping\\Ups\\Tests\\": "Tests/"
+    }
+  },
+  "config": {
+    "sort-packages": true,
+    "allow-plugins": {
+      "typo3/cms-composer-installers": true,
+      "typo3/class-alias-loader": true
+    }
+  },
+  "extra": {
+    "typo3/cms": {
+      "extension-key": "products_shipping_ups",
+      "version": "1.0.0",
+      "Package": {
+        "providesPackages": {}
+      }
+    },
+    "branch-alias": {
+      "dev-main": "1.0.x-dev"
+    }
+  }
+}

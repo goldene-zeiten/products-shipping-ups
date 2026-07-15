@@ -1,0 +1,66 @@
+categories:
+  shippingUps:
+    label: 'LLL:EXT:products_shipping_ups/Resources/Private/Language/locallang_settings.xlf:category.shippingUps'
+    parent: shipping
+
+settings:
+  products.shipping.ups.environment:
+    type: string
+    default: ''
+    label: 'LLL:EXT:products_shipping_ups/Resources/Private/Language/locallang_settings.xlf:setting.environment'
+    description: 'LLL:EXT:products_shipping_ups/Resources/Private/Language/locallang_settings.xlf:setting.environment.description'
+    category: shippingUps
+  products.shipping.ups.clientId:
+    type: string
+    default: ''
+    label: 'LLL:EXT:products_shipping_ups/Resources/Private/Language/locallang_settings.xlf:setting.clientId'
+    description: 'LLL:EXT:products_shipping_ups/Resources/Private/Language/locallang_settings.xlf:setting.inherit.description'
+    category: shippingUps
+  products.shipping.ups.clientSecret:
+    type: string
+    default: ''
+    label: 'LLL:EXT:products_shipping_ups/Resources/Private/Language/locallang_settings.xlf:setting.clientSecret'
+    description: 'LLL:EXT:products_shipping_ups/Resources/Private/Language/locallang_settings.xlf:setting.clientSecret.description'
+    category: shippingUps
+  products.shipping.ups.accountNumber:
+    type: string
+    default: ''
+    label: 'LLL:EXT:products_shipping_ups/Resources/Private/Language/locallang_settings.xlf:setting.accountNumber'
+    description: 'LLL:EXT:products_shipping_ups/Resources/Private/Language/locallang_settings.xlf:setting.inherit.description'
+    category: shippingUps
+  products.shipping.ups.originPostCode:
+    type: string
+    default: ''
+    label: 'LLL:EXT:products_shipping_ups/Resources/Private/Language/locallang_settings.xlf:setting.originPostCode'
+    description: 'LLL:EXT:products_shipping_ups/Resources/Private/Language/locallang_settings.xlf:setting.inherit.description'
+    category: shippingUps
+  products.shipping.ups.originCountryCode:
+    type: string
+    default: ''
+    label: 'LLL:EXT:products_shipping_ups/Resources/Private/Language/locallang_settings.xlf:setting.originCountryCode'
+    description: 'LLL:EXT:products_shipping_ups/Resources/Private/Language/locallang_settings.xlf:setting.inherit.description'
+    category: shippingUps
+  products.shipping.ups.originCity:
+    type: string
+    default: ''
+    label: 'LLL:EXT:products_shipping_ups/Resources/Private/Language/locallang_settings.xlf:setting.originCity'
+    description: 'LLL:EXT:products_shipping_ups/Resources/Private/Language/locallang_settings.xlf:setting.inherit.description'
+    category: shippingUps
+  products.shipping.ups.usedServices:
+    type: string
+    default: ''
+    label: 'LLL:EXT:products_shipping_ups/Resources/Private/Language/locallang_settings.xlf:setting.usedServices'
+    description: 'LLL:EXT:products_shipping_ups/Resources/Private/Language/locallang_settings.xlf:setting.usedServices.description'
+    category: shippingUps
+  products.shipping.ups.weightUnit:
+    type: string
+    default: ''
+    label: 'LLL:EXT:products_shipping_ups/Resources/Private/Language/locallang_settings.xlf:setting.weightUnit'
+    description: 'LLL:EXT:products_shipping_ups/Resources/Private/Language/locallang_settings.xlf:setting.inherit.description'
+    category: shippingUps
+  products.shipping.ups.apiBaseUrl:
+    type: string
+    default: ''
+    label: 'LLL:EXT:products_shipping_ups/Resources/Private/Language/locallang_settings.xlf:setting.apiBaseUrl'
+    description: 'LLL:EXT:products_shipping_ups/Resources/Private/Language/locallang_settings.xlf:setting.apiBaseUrl.description'
+    category: shippingUps

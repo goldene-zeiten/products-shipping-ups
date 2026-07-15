@@ -1,0 +1,22 @@
+services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+    public: false
+
+  GoldeneZeiten\Products\Shipping\Ups\:
+    resource: '../Classes/*'
+
+  # TYPO3 only exposes cache.* DI services for its own built-in caches, so the extension's token cache
+  # is defined here via a lazy CacheManager::getCache() factory (resolved at runtime, not at compile).
+  cache.products_shipping_ups_token:
+    class: TYPO3\CMS\Core\Cache\Frontend\FrontendInterface
+    factory:
+      - '@TYPO3\CMS\Core\Cache\CacheManager'
+      - 'getCache'
+    arguments:
+      - 'products_shipping_ups_token'
+
+  GoldeneZeiten\Products\Shipping\Ups\Authentication\UpsOAuthTokenProvider:
+    arguments:
+      $tokenCache: '@cache.products_shipping_ups_token'
