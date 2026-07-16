@@ -145,7 +145,7 @@ final class UpsShippingProviderTest extends AbstractFunctionalTestCase
         return new class () implements UpsRatingClient {
             public function rate(ShippingContext $context, UpsConfiguration $configuration): array
             {
-                throw new UpsRatingException('boom', 1752582000);
+                throw new UpsRatingException('Simulated UPS rating failure for the fallback test.', 1752582000);
             }
         };
     }
