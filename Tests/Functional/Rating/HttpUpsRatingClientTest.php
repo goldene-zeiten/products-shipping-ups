@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace GoldeneZeiten\Products\Shipping\Ups\Tests\Functional\Rating;
 
+use GoldeneZeiten\Products\ApiClient\Authentication\OAuth2ClientCredentialsProvider;
+use GoldeneZeiten\Products\ApiClient\Http\ApiHttpClient;
 use GoldeneZeiten\Products\Core\Domain\Dto\Shipping\ShippingContext;
 use GoldeneZeiten\Products\Core\Domain\ValueObject\Money;
-use GoldeneZeiten\Products\Shipping\Ups\Authentication\UpsOAuthTokenProvider;
 use GoldeneZeiten\Products\Shipping\Ups\Exception\UpsRatingException;
 use GoldeneZeiten\Products\Shipping\Ups\Rating\HttpUpsRatingClient;
 use GoldeneZeiten\Products\Shipping\Ups\Rating\UpsRateRequestBuilder;
@@ -85,9 +86,14 @@ final class HttpUpsRatingClientTest extends AbstractUpsMockTestCase
 
     private function subject(): HttpUpsRatingClient
     {
+        $apiHttpClient = new ApiHttpClient($this->httpClient());
+
         return new HttpUpsRatingClient(
-            $this->httpClient(),
-            new UpsOAuthTokenProvider($this->httpClient(), $this->get(CacheManager::class)->getCache('products_shipping_ups_token')),
+            $apiHttpClient,
+            new OAuth2ClientCredentialsProvider(
+                $apiHttpClient,
+                $this->get(CacheManager::class)->getCache('products_shipping_ups_token'),
+            ),
             new UpsRateRequestBuilder(),
             $this->get(EventDispatcherInterface::class),
             new NullLogger(),

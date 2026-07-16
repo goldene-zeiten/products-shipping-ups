@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace GoldeneZeiten\Products\Shipping\Ups\Tests\Unit\Configuration;
 
+use GoldeneZeiten\Products\ApiClient\Configuration\ApiSettingsResolver;
+use GoldeneZeiten\Products\ApiClient\Configuration\CurrentSiteResolver;
 use GoldeneZeiten\Products\Shipping\Ups\Configuration\UpsConfigurationFactory;
 use GoldeneZeiten\Products\Shipping\Ups\Configuration\UpsEnvironment;
 use PHPUnit\Framework\Attributes\Test;
@@ -115,6 +117,9 @@ final class UpsConfigurationFactoryTest extends UnitTestCase
             $extensionConfigurationService->method('get')->willReturn($extensionConfiguration);
         }
 
-        return new UpsConfigurationFactory($extensionConfigurationService);
+        return new UpsConfigurationFactory(
+            new ApiSettingsResolver($extensionConfigurationService),
+            new CurrentSiteResolver(),
+        );
     }
 }

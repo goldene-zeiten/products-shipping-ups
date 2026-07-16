@@ -17,6 +17,13 @@ services:
     arguments:
       - 'products_shipping_ups_token'
 
-  GoldeneZeiten\Products\Shipping\Ups\Authentication\UpsOAuthTokenProvider:
+  # The shared OAuth token provider is instantiated with this extension's own token cache, so UPS tokens
+  # never share storage with another integration's.
+  products_shipping_ups.oauth_token_provider:
+    class: GoldeneZeiten\Products\ApiClient\Authentication\OAuth2ClientCredentialsProvider
     arguments:
       $tokenCache: '@cache.products_shipping_ups_token'
+
+  GoldeneZeiten\Products\Shipping\Ups\Rating\HttpUpsRatingClient:
+    arguments:
+      $tokenProvider: '@products_shipping_ups.oauth_token_provider'

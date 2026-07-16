@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace GoldeneZeiten\Products\Shipping\Ups\Tests\Functional\Shipping;
 
+use GoldeneZeiten\Products\ApiClient\Configuration\ApiSettingsResolver;
+use GoldeneZeiten\Products\ApiClient\Configuration\CurrentSiteResolver;
 use GoldeneZeiten\Products\Core\Domain\Dto\Shipping\ShippingContext;
 use GoldeneZeiten\Products\Core\Domain\ValueObject\Money;
 use GoldeneZeiten\Products\Shipping\Ups\Configuration\UpsConfiguration;
@@ -22,6 +24,7 @@ use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
 final class UpsShippingProviderTest extends AbstractFunctionalTestCase
 {
     protected array $testExtensionsToLoad = [
+        'goldene-zeiten/products-api-client',
         'goldene-zeiten/products-shipping-ups',
     ];
 
@@ -95,17 +98,20 @@ final class UpsShippingProviderTest extends AbstractFunctionalTestCase
 
     private function subject(UpsRatingClient $ratingClient, string $clientId = 'cid', string $usedServices = ''): UpsShippingProvider
     {
-        $factory = new UpsConfigurationFactory($this->extensionConfiguration([
-            'environment' => 'sandbox',
-            'clientId' => $clientId,
-            'clientSecret' => 'secret',
-            'accountNumber' => 'ACC',
-            'originPostCode' => '80331',
-            'originCountryCode' => 'DE',
-            'originCity' => '',
-            'usedServices' => $usedServices,
-            'weightUnit' => 'KGS',
-        ]));
+        $factory = new UpsConfigurationFactory(
+            new ApiSettingsResolver($this->extensionConfiguration([
+                'environment' => 'sandbox',
+                'clientId' => $clientId,
+                'clientSecret' => 'secret',
+                'accountNumber' => 'ACC',
+                'originPostCode' => '80331',
+                'originCountryCode' => 'DE',
+                'originCity' => '',
+                'usedServices' => $usedServices,
+                'weightUnit' => 'KGS',
+            ])),
+            new CurrentSiteResolver(),
+        );
 
         return new UpsShippingProvider(
             $factory,

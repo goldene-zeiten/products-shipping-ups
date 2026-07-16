@@ -4,29 +4,30 @@ declare(strict_types=1);
 
 namespace GoldeneZeiten\Products\Shipping\Ups\Rating;
 
+use GoldeneZeiten\Products\ApiClient\Authentication\OAuth2ClientCredentialsProvider;
+use GoldeneZeiten\Products\ApiClient\Authentication\OAuth2Credentials;
+use GoldeneZeiten\Products\ApiClient\Exception\ApiTransportException;
+use GoldeneZeiten\Products\ApiClient\Http\ApiHttpClient;
 use GoldeneZeiten\Products\Core\Domain\Dto\Shipping\ShippingContext;
-use GoldeneZeiten\Products\Shipping\Ups\Authentication\UpsOAuthTokenProvider;
 use GoldeneZeiten\Products\Shipping\Ups\Configuration\UpsConfiguration;
 use GoldeneZeiten\Products\Shipping\Ups\Domain\Dto\UpsRate;
 use GoldeneZeiten\Products\Shipping\Ups\Event\ModifyUpsRateRequestEvent;
 use GoldeneZeiten\Products\Shipping\Ups\Exception\UpsRatingException;
 use Psr\EventDispatcher\EventDispatcherInterface;
-use Psr\Http\Client\ClientExceptionInterface;
-use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\AsAlias;
-use TYPO3\CMS\Core\Http\Request;
-use TYPO3\CMS\Core\Http\Stream;
 
 #[AsAlias(UpsRatingClient::class)]
 final class HttpUpsRatingClient implements UpsRatingClient
 {
     private const RATING_PATH = '/api/rating/v2409/Shop';
 
+    private const TOKEN_PATH = '/security/v1/oauth/token';
+
     public function __construct(
-        private readonly ClientInterface $httpClient,
-        private readonly UpsOAuthTokenProvider $tokenProvider,
+        private readonly ApiHttpClient $httpClient,
+        private readonly OAuth2ClientCredentialsProvider $tokenProvider,
         private readonly UpsRateRequestBuilder $requestBuilder,
         private readonly EventDispatcherInterface $eventDispatcher,
         private readonly LoggerInterface $logger,
@@ -62,10 +63,11 @@ final class HttpUpsRatingClient implements UpsRatingClient
      */
     private function sendWithRetry(UpsConfiguration $configuration, array $payload): ResponseInterface
     {
-        $response = $this->send($configuration, $payload, $this->tokenProvider->getToken($configuration));
+        $credentials = $this->credentials($configuration);
+        $response = $this->send($configuration, $payload, $this->tokenProvider->getToken($credentials));
         if ($response->getStatusCode() === 401) {
             // The cached token was rejected (UPS can revoke early); retry once with a fresh one.
-            $response = $this->send($configuration, $payload, $this->tokenProvider->getToken($configuration, true));
+            $response = $this->send($configuration, $payload, $this->tokenProvider->getToken($credentials, true));
         }
 
         return $response;
@@ -76,25 +78,24 @@ final class HttpUpsRatingClient implements UpsRatingClient
      */
     private function send(UpsConfiguration $configuration, array $payload, string $token): ResponseInterface
     {
-        $body = new Stream('php://temp', 'rw');
-        $body->write(json_encode($payload, JSON_THROW_ON_ERROR));
-        $body->rewind();
-        $request = new Request(
-            $configuration->baseUrl() . self::RATING_PATH,
-            'POST',
-            $body,
-            [
-                'Authorization' => 'Bearer ' . $token,
-                'Content-Type' => 'application/json',
-                'Accept' => 'application/json',
-            ],
-        );
-
         try {
-            return $this->httpClient->sendRequest($request);
-        } catch (ClientExceptionInterface $exception) {
+            return $this->httpClient->postJson(
+                $configuration->baseUrl() . self::RATING_PATH,
+                $payload,
+                ['Authorization' => 'Bearer ' . $token],
+            );
+        } catch (ApiTransportException $exception) {
             throw new UpsRatingException('UPS rate request failed at transport level.', 1752580100, $exception);
         }
+    }
+
+    private function credentials(UpsConfiguration $configuration): OAuth2Credentials
+    {
+        return new OAuth2Credentials(
+            $configuration->baseUrl() . self::TOKEN_PATH,
+            $configuration->clientId,
+            $configuration->clientSecret,
+        );
     }
 
     /**

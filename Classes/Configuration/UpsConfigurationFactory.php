@@ -4,21 +4,22 @@ declare(strict_types=1);
 
 namespace GoldeneZeiten\Products\Shipping\Ups\Configuration;
 
-use Psr\Http\Message\ServerRequestInterface;
-use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
+use GoldeneZeiten\Products\ApiClient\Configuration\ApiSettingsResolver;
+use GoldeneZeiten\Products\ApiClient\Configuration\CurrentSiteResolver;
 use TYPO3\CMS\Core\Site\Entity\Site;
 
 /**
- * Resolves the effective UPS configuration by layering the system-wide extension configuration under a
- * site's settings: a non-empty site setting overrides the extension-configuration default, an empty one
- * inherits it. This lets a single installation carry a global default while a multi-shop instance runs a
- * different sender or credentials per site.
- *
- * It is the only place that reads either source, keeping every consuming service request- and
- * settings-agnostic.
+ * Builds the effective UPS configuration for a site. The layering of the system-wide extension
+ * configuration under a site's settings is done by the shared {@see ApiSettingsResolver}; this factory
+ * only maps the resolved values onto the typed {@see UpsConfiguration} value object, so every consuming
+ * service stays free of both the settings source and the request.
  */
 final readonly class UpsConfigurationFactory
 {
+    private const EXTENSION_KEY = 'products_shipping_ups';
+
+    private const SETTINGS_PREFIX = 'products.shipping.ups.';
+
     private const FIELDS = [
         'environment',
         'clientId',
@@ -33,71 +34,31 @@ final readonly class UpsConfigurationFactory
     ];
 
     public function __construct(
-        private ExtensionConfiguration $extensionConfiguration,
+        private ApiSettingsResolver $settingsResolver,
+        private CurrentSiteResolver $currentSiteResolver,
     ) {}
 
     public function forCurrentRequest(): UpsConfiguration
     {
-        $request = $GLOBALS['TYPO3_REQUEST'] ?? null;
-        $site = $request instanceof ServerRequestInterface ? $request->getAttribute('site') : null;
-
-        return $this->forSite($site instanceof Site ? $site : null);
+        return $this->forSite($this->currentSiteResolver->resolve());
     }
 
     public function forSite(?Site $site): UpsConfiguration
     {
-        $defaults = $this->extensionDefaults();
-        $overrides = $this->siteOverrides($site);
-        $value = static fn(string $key): string => ($overrides[$key] ?? '') !== ''
-            ? $overrides[$key]
-            : ($defaults[$key] ?? '');
+        $value = $this->settingsResolver->resolve(self::EXTENSION_KEY, self::SETTINGS_PREFIX, self::FIELDS, $site);
 
         return new UpsConfiguration(
-            environment: UpsEnvironment::fromSetting($value('environment')),
-            clientId: $value('clientId'),
-            clientSecret: $value('clientSecret'),
-            accountNumber: $value('accountNumber'),
-            originPostCode: $value('originPostCode'),
-            originCountryCode: strtoupper($value('originCountryCode')),
-            originCity: $value('originCity'),
-            weightUnit: strtoupper($value('weightUnit')) === 'LBS' ? 'LBS' : 'KGS',
-            usedServices: $this->parseServices($value('usedServices')),
-            apiBaseUrl: rtrim($value('apiBaseUrl'), '/'),
+            environment: UpsEnvironment::fromSetting($value['environment']),
+            clientId: $value['clientId'],
+            clientSecret: $value['clientSecret'],
+            accountNumber: $value['accountNumber'],
+            originPostCode: $value['originPostCode'],
+            originCountryCode: strtoupper($value['originCountryCode']),
+            originCity: $value['originCity'],
+            weightUnit: strtoupper($value['weightUnit']) === 'LBS' ? 'LBS' : 'KGS',
+            usedServices: $this->parseServices($value['usedServices']),
+            apiBaseUrl: rtrim($value['apiBaseUrl'], '/'),
         );
-    }
-
-    /**
-     * @return array<string, string>
-     */
-    private function extensionDefaults(): array
-    {
-        try {
-            $config = $this->extensionConfiguration->get('products_shipping_ups');
-        } catch (\Throwable) {
-            return [];
-        }
-
-        return is_array($config)
-            ? array_map(static fn(mixed $value): string => trim((string)$value), $config)
-            : [];
-    }
-
-    /**
-     * @return array<string, string>
-     */
-    private function siteOverrides(?Site $site): array
-    {
-        if ($site === null) {
-            return [];
-        }
-
-        $settings = $site->getSettings();
-        $overrides = [];
-        foreach (self::FIELDS as $field) {
-            $overrides[$field] = trim((string)$settings->get('products.shipping.ups.' . $field, ''));
-        }
-
-        return $overrides;
     }
 
     /**
