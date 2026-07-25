@@ -86,7 +86,7 @@ final class HttpUpsRatingClientTest extends AbstractUpsMockTestCase
 
     private function subject(): HttpUpsRatingClient
     {
-        $apiHttpClient = new ApiHttpClient($this->httpClient());
+        $apiHttpClient = new ApiHttpClient($this->requestFactory());
 
         return new HttpUpsRatingClient(
             $apiHttpClient,
