@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+	<file source-language="en" target-language="de" datatype="plaintext" original="EXT:products_shipping_ups/Resources/Private/Language/de.locallang_settings.xlf" date="2026-07-15T12:00:00Z" product-name="products_shipping_ups">
+		<header/>
+		<body>
+			<trans-unit id="category.shippingUps" resname="category.shippingUps">
+				<source>UPS</source>
+				<target>UPS</target>
+			</trans-unit>
+			<trans-unit id="setting.inherit.description" resname="setting.inherit.description">
+				<source>Leave empty to inherit the value from the extension configuration. Set it to override that default for this site.</source>
+				<target>Leer lassen, um den Wert aus der Extension-Konfiguration zu übernehmen. Ein gesetzter Wert überschreibt diesen Standard für diese Website.</target>
+			</trans-unit>
+			<trans-unit id="setting.environment" resname="setting.environment">
+				<source>Environment (sandbox / production)</source>
+				<target>Umgebung (sandbox / production)</target>
+			</trans-unit>
+			<trans-unit id="setting.environment.description" resname="setting.environment.description">
+				<source>Either "sandbox" (UPS CIE) or "production". Leave empty to inherit the extension configuration.</source>
+				<target>Entweder „sandbox“ (UPS CIE) oder „production“. Leer lassen, um die Extension-Konfiguration zu übernehmen.</target>
+			</trans-unit>
+			<trans-unit id="setting.clientId" resname="setting.clientId">
+				<source>OAuth client ID</source>
+				<target>OAuth-Client-ID</target>
+			</trans-unit>
+			<trans-unit id="setting.clientSecret" resname="setting.clientSecret">
+				<source>OAuth client secret</source>
+				<target>OAuth-Client-Secret</target>
+			</trans-unit>
+			<trans-unit id="setting.clientSecret.description" resname="setting.clientSecret.description">
+				<source>Overrides the client secret for this site. Prefer referencing an environment variable so the secret stays out of version control. Leave empty to inherit the extension configuration.</source>
+				<target>Überschreibt das Client-Secret für diese Website. Am besten eine Umgebungsvariable referenzieren, damit das Secret nicht in der Versionsverwaltung landet. Leer lassen, um die Extension-Konfiguration zu übernehmen.</target>
+			</trans-unit>
+			<trans-unit id="setting.accountNumber" resname="setting.accountNumber">
+				<source>Account number</source>
+				<target>Kontonummer</target>
+			</trans-unit>
+			<trans-unit id="setting.originPostCode" resname="setting.originPostCode">
+				<source>Origin postal code</source>
+				<target>Postleitzahl des Versandorts</target>
+			</trans-unit>
+			<trans-unit id="setting.originCountryCode" resname="setting.originCountryCode">
+				<source>Origin country code</source>
+				<target>Ländercode des Versandorts</target>
+			</trans-unit>
+			<trans-unit id="setting.originCity" resname="setting.originCity">
+				<source>Origin city</source>
+				<target>Ort des Versandorts</target>
+			</trans-unit>
+			<trans-unit id="setting.usedServices" resname="setting.usedServices">
+				<source>Used service codes</source>
+				<target>Verwendete Servicecodes</target>
+			</trans-unit>
+			<trans-unit id="setting.usedServices.description" resname="setting.usedServices.description">
+				<source>Comma-separated UPS service codes to offer, e.g. "11,65,07". Leave empty to offer every service UPS returns.</source>
+				<target>Kommagetrennte UPS-Servicecodes, die angeboten werden sollen, z. B. „11,65,07“. Leer lassen, um alle von UPS gelieferten Services anzubieten.</target>
+			</trans-unit>
+			<trans-unit id="setting.weightUnit" resname="setting.weightUnit">
+				<source>Weight unit (KGS / LBS)</source>
+				<target>Gewichtseinheit (KGS / LBS)</target>
+			</trans-unit>
+			<trans-unit id="setting.apiBaseUrl" resname="setting.apiBaseUrl">
+				<source>API base URL override</source>
+				<target>Abweichende API-Basis-URL</target>
+			</trans-unit>
+			<trans-unit id="setting.apiBaseUrl.description" resname="setting.apiBaseUrl.description">
+				<source>Send the UPS calls to this host instead of the real UPS host, e.g. a proxy or a local mock server. Leave empty to use the environment's real host.</source>
+				<target>Die UPS-Aufrufe an diesen Host statt an den echten UPS-Host senden, z. B. über einen Proxy oder einen lokalen Mock-Server. Leer lassen, um den echten Host der Umgebung zu verwenden.</target>
+			</trans-unit>
+		</body>
+	</file>
+</xliff>
