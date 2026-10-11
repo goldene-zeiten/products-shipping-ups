@@ -84,6 +84,52 @@ final class HttpUpsRatingClientTest extends AbstractUpsMockTestCase
         $this->assertSame('2.5', $body['RateRequest']['Shipment']['Package'][0]['PackageWeight']['Weight']);
     }
 
+    /**
+     * Shipping is re-quoted at review and again at placement; an identical rate request within a few
+     * minutes is answered from the cache instead of another live call.
+     */
+    #[Test]
+    public function anIdenticalRateRequestIsAnsweredFromTheCache(): void
+    {
+        $subject = $this->subject();
+
+        $first = $subject->rate($this->context('BE'), $this->configuration());
+        $second = $this->subject()->rate($this->context('BE'), $this->configuration());
+
+        $this->assertEquals($first, $second);
+        $this->assertSame(1, $this->recordedRequests(self::RATING_PATH));
+    }
+
+    #[Test]
+    public function aDifferentShipmentIsRatedAgain(): void
+    {
+        $this->subject()->rate($this->context('BE'), $this->configuration());
+        $this->subject()->rate($this->context('NL'), $this->configuration());
+
+        $this->assertSame(2, $this->recordedRequests(self::RATING_PATH));
+    }
+
+    #[Test]
+    public function otherCredentialsAreRatedAgain(): void
+    {
+        $this->subject()->rate($this->context('BE'), $this->configuration());
+        $this->subject()->rate($this->context('BE'), $this->configuration('other-client'));
+
+        $this->assertSame(2, $this->recordedRequests(self::RATING_PATH));
+    }
+
+    #[Test]
+    public function aFailedRateRequestIsNotCached(): void
+    {
+        try {
+            $this->subject()->rate($this->context('YY'), $this->configuration());
+        } catch (UpsRatingException) {
+        }
+
+        $this->expectException(UpsRatingException::class);
+        $this->subject()->rate($this->context('YY'), $this->configuration());
+    }
+
     private function subject(): HttpUpsRatingClient
     {
         $apiHttpClient = new ApiHttpClient($this->requestFactory());
@@ -96,6 +142,7 @@ final class HttpUpsRatingClientTest extends AbstractUpsMockTestCase
             ),
             new UpsRateRequestBuilder(),
             $this->get(EventDispatcherInterface::class),
+            $this->get(CacheManager::class)->getCache('products_shipping_ups_rates'),
             new NullLogger(),
         );
     }

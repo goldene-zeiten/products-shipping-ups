@@ -15,4 +15,13 @@ defined('TYPO3') or die();
             'system',
         ],
     ];
+    // Live rates are reused for a few minutes (the lifetime is set per entry), so the repeated quotes of
+    // one checkout do not each call UPS.
+    $GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations']['products_shipping_ups_rates'] ??= [
+        'frontend' => VariableFrontend::class,
+        'backend' => Typo3DatabaseBackend::class,
+        'groups' => [
+            'system',
+        ],
+    ];
 })();

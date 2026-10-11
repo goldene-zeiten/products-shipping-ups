@@ -50,7 +50,7 @@ final class UpsShippingProvider implements ShippingProviderInterface
      */
     public function quote(ShippingContext $context): array
     {
-        $configuration = $this->configurationFactory->forCurrentRequest();
+        $configuration = $this->configuration($context);
         if (!$configuration->isComplete()) {
             return [];
         }
@@ -63,6 +63,17 @@ final class UpsShippingProvider implements ShippingProviderInterface
         }
 
         return $this->toOptions($rates, $context, $configuration);
+    }
+
+    /**
+     * The configuration of the site the basket is shopped on; the express shipping-rate callback quotes
+     * before core publishes the current request.
+     */
+    private function configuration(ShippingContext $context): UpsConfiguration
+    {
+        $site = $context->getSite();
+
+        return $site !== null ? $this->configurationFactory->forSite($site) : $this->configurationFactory->forCurrentRequest();
     }
 
     public function resolve(string $optionIdentifier, ShippingContext $context): ?ShippingOption

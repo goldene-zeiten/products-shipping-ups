@@ -68,6 +68,10 @@ with `Rating/UpsRateRequestBuilder`, dispatches `ModifyUpsRateRequestEvent`, and
   error. Only transport failures (wrapped from the shared package's `ApiTransportException`) and unexpected
   statuses raise `UpsRatingException`.
 - A 401 triggers one retry with a freshly minted token (`$forceRefresh = true` on the shared provider).
+- Successful answers (including the empty "no rate" result) are cached for five minutes in the
+  `products_shipping_ups_rates` cache, keyed by a hash of the full rate request and the account it is
+  rated for. Checkout quotes shipping at the shipping step, at review and at placement; the cache keeps
+  that to one live call. Failures are never cached.
 
 The provider maps each `UpsRate` to a core `ShippingOption` (label from `UpsServiceCatalog`, cost via
 `Money::fromDecimalString`), filters by the `usedServices` allow-list, and **skips any rate quoted in a

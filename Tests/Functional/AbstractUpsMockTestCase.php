@@ -26,6 +26,7 @@ abstract class AbstractUpsMockTestCase extends AbstractApiMockTestCase
     {
         parent::setUp();
         $this->get(CacheManager::class)->getCache('products_shipping_ups_token')->flush();
+        $this->get(CacheManager::class)->getCache('products_shipping_ups_rates')->flush();
     }
 
     /**

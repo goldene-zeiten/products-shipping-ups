@@ -17,10 +17,17 @@ use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\AsAlias;
+use TYPO3\CMS\Core\Cache\Frontend\FrontendInterface;
 
+/**
+ * Rates are cached for a few minutes per rate request and account, so the repeated quotes of one checkout
+ * (shipping step, review, placement) cost a single live call.
+ */
 #[AsAlias(UpsRatingClient::class)]
 final class HttpUpsRatingClient implements UpsRatingClient
 {
+    private const RATE_CACHE_LIFETIME = 300;
+
     private const RATING_PATH = '/api/rating/v2409/Shop';
 
     private const TOKEN_PATH = '/security/v1/oauth/token';
@@ -30,6 +37,7 @@ final class HttpUpsRatingClient implements UpsRatingClient
         private readonly OAuth2ClientCredentialsProvider $tokenProvider,
         private readonly UpsRateRequestBuilder $requestBuilder,
         private readonly EventDispatcherInterface $eventDispatcher,
+        private readonly FrontendInterface $rateCache,
         private readonly LoggerInterface $logger,
     ) {}
 
@@ -39,8 +47,37 @@ final class HttpUpsRatingClient implements UpsRatingClient
     public function rate(ShippingContext $context, UpsConfiguration $configuration): array
     {
         $payload = $this->buildPayload($context, $configuration);
+        $cacheIdentifier = $this->cacheIdentifier($configuration, $payload);
+        $cached = $this->rateCache->get($cacheIdentifier);
+        if (is_array($cached)) {
+            return array_map(static fn(array $rate): UpsRate => new UpsRate(...$rate), $cached);
+        }
 
-        return $this->extractRates($this->sendWithRetry($configuration, $payload));
+        $rates = $this->extractRates($this->sendWithRetry($configuration, $payload));
+        $this->rateCache->set(
+            $cacheIdentifier,
+            array_map(static fn(UpsRate $rate): array => get_object_vars($rate), $rates),
+            [],
+            self::RATE_CACHE_LIFETIME
+        );
+
+        return $rates;
+    }
+
+    /**
+     * The full rate request plus the account it is rated for: a different shipment or other credentials
+     * never share an answer. The identifier is a hash, so no credential is stored in clear.
+     *
+     * @param array<string, mixed> $payload
+     */
+    private function cacheIdentifier(UpsConfiguration $configuration, array $payload): string
+    {
+        return hash('sha256', (string)json_encode([
+            $configuration->baseUrl(),
+            $configuration->clientId,
+            $configuration->clientSecret,
+            $payload,
+        ]));
     }
 
     /**
