@@ -5,7 +5,7 @@
     <extension class="\T3Docs\Typo3DocsTheme\DependencyInjection\Typo3DocsThemeExtension"
                project-home="https://extensions.typo3.org/extension/products_shipping_ups/"
                typo3-core-preferred="13"
-               interlink-shortcode="products_shipping_ups"
+               interlink-shortcode="goldene-zeiten/products-shipping-ups"
     />
     <project title="Products UPS Shipping"
              release="1.0"
