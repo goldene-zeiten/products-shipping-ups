@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+	<file source-language="en" datatype="plaintext" original="EXT:products_shipping_ups/Resources/Private/Language/locallang.xlf" date="2026-10-17T00:00:00Z" product-name="products_shipping_ups">
+		<header/>
+		<body>
+			<trans-unit id="deliveryEstimate.businessDay" resname="deliveryEstimate.businessDay">
+				<source>%d business day</source>
+			</trans-unit>
+			<trans-unit id="deliveryEstimate.businessDays" resname="deliveryEstimate.businessDays">
+				<source>%d business days</source>
+			</trans-unit>
+		</body>
+	</file>
+</xliff>

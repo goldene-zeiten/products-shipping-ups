@@ -64,3 +64,27 @@ settings:
     label: 'LLL:EXT:products_shipping_ups/Resources/Private/Language/locallang_settings.xlf:setting.apiBaseUrl'
     description: 'LLL:EXT:products_shipping_ups/Resources/Private/Language/locallang_settings.xlf:setting.apiBaseUrl.description'
     category: shippingUps
+  products.shipping.ups.defaultPackageWeight:
+    type: int
+    default: 0
+    label: 'LLL:EXT:products_shipping_ups/Resources/Private/Language/locallang_settings.xlf:setting.defaultPackageWeight'
+    description: 'LLL:EXT:products_shipping_ups/Resources/Private/Language/locallang_settings.xlf:setting.defaultPackageWeight.description'
+    category: shippingUps
+  products.shipping.ups.declaredValueLimit:
+    type: string
+    default: ''
+    label: 'LLL:EXT:products_shipping_ups/Resources/Private/Language/locallang_settings.xlf:setting.declaredValueLimit'
+    description: 'LLL:EXT:products_shipping_ups/Resources/Private/Language/locallang_settings.xlf:setting.declaredValueLimit.description'
+    category: shippingUps
+  products.shipping.ups.freeServices:
+    type: string
+    default: ''
+    label: 'LLL:EXT:products_shipping_ups/Resources/Private/Language/locallang_settings.xlf:setting.freeServices'
+    description: 'LLL:EXT:products_shipping_ups/Resources/Private/Language/locallang_settings.xlf:setting.freeServices.description'
+    category: shippingUps
+  products.shipping.ups.freeShippingThreshold:
+    type: string
+    default: ''
+    label: 'LLL:EXT:products_shipping_ups/Resources/Private/Language/locallang_settings.xlf:setting.freeShippingThreshold'
+    description: 'LLL:EXT:products_shipping_ups/Resources/Private/Language/locallang_settings.xlf:setting.freeShippingThreshold.description'
+    category: shippingUps

@@ -16,6 +16,7 @@ use GoldeneZeiten\Products\Shipping\Ups\Rating\GermanOriginServiceCatalog;
 use GoldeneZeiten\Products\Shipping\Ups\Rating\UpsRatingClient;
 use GoldeneZeiten\Products\Shipping\Ups\Shipping\UpsShippingProvider;
 use GoldeneZeiten\Products\Testing\AbstractFunctionalTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\NullLogger;
@@ -43,7 +44,39 @@ final class UpsShippingProviderTest extends AbstractFunctionalTestCase
         $this->assertSame('UPS Standard', $options[0]->getLabel());
         $this->assertSame(999, $options[0]->getCost()->getCents());
         $this->assertSame('UPS Saver', $options[1]->getLabel());
-        $this->assertSame('2 business day(s)', $options[1]->getDeliveryEstimate());
+        $this->assertSame('2 business days', $options[1]->getDeliveryEstimate());
+    }
+
+    #[Test]
+    public function aSingleTransitDayIsWordedInTheSingular(): void
+    {
+        $provider = $this->subject($this->ratingClient([new UpsRate('65', '19.99', 'EUR', '1')]));
+
+        $this->assertSame('1 business day', $provider->quote($this->context())[0]->getDeliveryEstimate());
+    }
+
+    #[Test]
+    #[DataProvider('freeServiceProvider')]
+    public function aFreeServiceCostsNothingFromTheThreshold(string $freeServices, string $threshold, int $goodsCents, int $expectedStandardCents): void
+    {
+        $provider = $this->subject(
+            $this->ratingClient([new UpsRate('11', '9.99', 'EUR'), new UpsRate('65', '19.99', 'EUR')]),
+            freeServices: $freeServices,
+            freeShippingThreshold: $threshold,
+        );
+
+        $options = $provider->quote(new ShippingContext([], 2500, Money::fromCents($goodsCents), 'EUR', 'DE', '93047'));
+
+        $this->assertSame($expectedStandardCents, $options[0]->getCost()->getCents());
+        $this->assertSame(1999, $options[1]->getCost()->getCents(), 'A service not configured as free keeps its rate.');
+    }
+
+    public static function freeServiceProvider(): \Generator
+    {
+        yield 'no free service charges the rate' => ['freeServices' => '', 'threshold' => '', 'goodsCents' => 500000, 'expectedStandardCents' => 999];
+        yield 'a free service without threshold is always free' => ['freeServices' => '11', 'threshold' => '', 'goodsCents' => 5000, 'expectedStandardCents' => 0];
+        yield 'below the threshold the rate is charged' => ['freeServices' => '11', 'threshold' => '100', 'goodsCents' => 9999, 'expectedStandardCents' => 999];
+        yield 'from the threshold it is free' => ['freeServices' => '11', 'threshold' => '100', 'goodsCents' => 10000, 'expectedStandardCents' => 0];
     }
 
     #[Test]
@@ -96,8 +129,13 @@ final class UpsShippingProviderTest extends AbstractFunctionalTestCase
         $this->assertNull($provider->resolve('99', $this->context()));
     }
 
-    private function subject(UpsRatingClient $ratingClient, string $clientId = 'cid', string $usedServices = ''): UpsShippingProvider
-    {
+    private function subject(
+        UpsRatingClient $ratingClient,
+        string $clientId = 'cid',
+        string $usedServices = '',
+        string $freeServices = '',
+        string $freeShippingThreshold = '',
+    ): UpsShippingProvider {
         $factory = new UpsConfigurationFactory(
             new ApiSettingsResolver($this->extensionConfiguration([
                 'environment' => 'sandbox',
@@ -109,6 +147,8 @@ final class UpsShippingProviderTest extends AbstractFunctionalTestCase
                 'originCity' => '',
                 'usedServices' => $usedServices,
                 'weightUnit' => 'KGS',
+                'freeServices' => $freeServices,
+                'freeShippingThreshold' => $freeShippingThreshold,
             ])),
             new CurrentSiteResolver(),
         );

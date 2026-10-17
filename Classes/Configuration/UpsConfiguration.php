@@ -14,6 +14,10 @@ final readonly class UpsConfiguration
 {
     /**
      * @param string[] $usedServices UPS service codes to offer; empty offers every service UPS returns
+     * @param int $defaultPackageWeight grams sent for a basket without weights; 0 sends the UPS minimum
+     * @param int $declaredValueLimit cents up to which the goods value is declared for insurance; 0 declares none
+     * @param string[] $freeServices UPS service codes the customer is not charged for
+     * @param int $freeShippingThreshold cents of goods value from which the free services are free; 0 always
      */
     public function __construct(
         public UpsEnvironment $environment,
@@ -26,6 +30,10 @@ final readonly class UpsConfiguration
         public string $weightUnit,
         public array $usedServices,
         public string $apiBaseUrl = '',
+        public int $defaultPackageWeight = 0,
+        public int $declaredValueLimit = 0,
+        public array $freeServices = [],
+        public int $freeShippingThreshold = 0,
     ) {}
 
     /**
@@ -55,5 +63,13 @@ final readonly class UpsConfiguration
     public function offersService(string $serviceCode): bool
     {
         return $this->usedServices === [] || in_array($serviceCode, $this->usedServices, true);
+    }
+
+    /**
+     * Whether the customer ships the given service for free at the given goods value, in cents.
+     */
+    public function shipsFree(string $serviceCode, int $goodsCents): bool
+    {
+        return in_array($serviceCode, $this->freeServices, true) && $goodsCents >= $this->freeShippingThreshold;
     }
 }

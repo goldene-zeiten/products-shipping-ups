@@ -27,3 +27,15 @@ weightUnit = KGS
 
 # cat=advanced/enable/10; type=string; label=API base URL override: Advanced. Overrides the environment's UPS API base URL, e.g. a proxy or a local mock server. Leave empty to use the environment's default.
 apiBaseUrl =
+
+# cat=package/dims/10; type=int+; label=Default package weight (g): Grams sent to UPS for a basket whose products carry no weight, e.g. the shipping box and packaging. 0 sends the UPS minimum of 0.1 kg.
+defaultPackageWeight = 0
+
+# cat=package/dims/20; type=string; label=Declared value limit: Declares the goods value for UPS insurance, up to this amount (e.g. 10000). Leave empty to declare no value.
+declaredValueLimit =
+
+# cat=services/enable/30; type=string; label=Free service codes: Comma-separated UPS service codes the customer is not charged for, e.g. 11.
+freeServices =
+
+# cat=services/enable/40; type=string; label=Free shipping from goods value: Goods value from which the free services cost nothing, e.g. 100. Leave empty to ship them free for every basket.
+freeShippingThreshold =

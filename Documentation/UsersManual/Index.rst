@@ -21,8 +21,8 @@ UPS options at checkout
 Once configured, the checkout's shipping-method step includes live UPS services alongside (and, whenever
 UPS can serve the basket, ahead of) the shop's own table-rate shipping methods — for example
 :guilabel:`UPS Standard` or :guilabel:`UPS Saver`, each with a real, live price and, where UPS provides one,
-a delivery-time estimate (e.g. "2 business day(s)"). Which UPS service names are offered, and what they are
-labelled, depends on the shipment's origin country — see
+a delivery-time estimate in the site language (e.g. "2 business days", "2 Werktage"). Which UPS service names
+are offered, and what they are labelled, depends on the shipment's origin country — see
 :ref:`UPS service catalog <developer-service-catalog>`.
 
 There is nothing to maintain per record for UPS itself: no shipping-method records, no manual price list.

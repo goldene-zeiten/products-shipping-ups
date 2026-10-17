@@ -105,6 +105,39 @@ the extension consumes, so no service resolves settings or the request itself.
         The unit the basket weight is sent to UPS in — kilograms or pounds. Any other value falls back to
         ``KGS``.
 
+    ..  confval:: products.shipping.ups.defaultPackageWeight
+        :type: int
+        :Default: 0
+
+        Grams sent to UPS for a basket whose products carry no weight — the shipping box and packaging,
+        e.g. ``500``. Without it such a basket is rated at the UPS minimum of 0.1 kg, so the quotes are
+        lower than what UPS charges. A basket with weights is always sent with its own weight.
+
+    ..  confval:: products.shipping.ups.declaredValueLimit
+        :type: string (amount)
+        :Default: (empty)
+
+        Declares the goods value of the basket to UPS for insurance, up to this amount, e.g. ``10000``: a
+        basket of 2.480 € is declared at 2.480 €, one of 14.500 € at 10.000 €. The quotes then include the
+        UPS surcharge for the declared value. Leave empty to declare no value.
+
+    ..  confval:: products.shipping.ups.freeServices
+        :type: string
+        :Default: (empty)
+
+        A comma-separated list of UPS service codes the customer is not charged for, e.g. ``11`` for UPS
+        Standard. UPS is still asked for the rate, so the service is only offered where UPS delivers; the
+        customer sees it at 0,00 €.
+
+    ..  confval:: products.shipping.ups.freeShippingThreshold
+        :type: string (amount)
+        :Default: (empty)
+
+        The goods value from which the services in
+        ``products.shipping.ups.freeServices``
+        cost nothing, e.g. ``100``. Below it the UPS rate is charged. Leave empty to ship them free for every
+        basket.
+
     ..  confval:: products.shipping.ups.apiBaseUrl
         :type: string
         :Default: (empty)

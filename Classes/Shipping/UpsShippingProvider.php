@@ -16,6 +16,7 @@ use GoldeneZeiten\Products\Shipping\Ups\Rating\UpsRatingClient;
 use GoldeneZeiten\Products\Shipping\Ups\Rating\UpsServiceCatalog;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
+use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
 
 /**
  * A real (non-fallback) carrier that offers live UPS rates. Being a real carrier, it supersedes the
@@ -96,7 +97,7 @@ final class UpsShippingProvider implements ShippingProviderInterface
         $options = [];
         foreach ($rates as $rate) {
             if ($this->isOffered($rate, $context, $configuration)) {
-                $options[] = $this->toOption($rate);
+                $options[] = $this->toOption($rate, $context, $configuration);
             }
         }
 
@@ -124,15 +125,27 @@ final class UpsShippingProvider implements ShippingProviderInterface
         return true;
     }
 
-    private function toOption(UpsRate $rate): ShippingOption
+    private function toOption(UpsRate $rate, ShippingContext $context, UpsConfiguration $configuration): ShippingOption
     {
+        $shipsFree = $configuration->shipsFree($rate->serviceCode, $context->getGoodsTotal()->getCents());
         return new ShippingOption(
             self::IDENTIFIER,
             $rate->serviceCode,
             $this->serviceCatalog->label($rate->serviceCode),
-            Money::fromDecimalString($rate->amount),
+            $shipsFree ? Money::fromCents(0) : Money::fromDecimalString($rate->amount),
             null,
-            $rate->businessDaysInTransit !== '' ? sprintf('%s business day(s)', $rate->businessDaysInTransit) : '',
+            $this->deliveryEstimate($rate->businessDaysInTransit),
         );
+    }
+
+    private function deliveryEstimate(string $businessDays): string
+    {
+        if ($businessDays === '') {
+            return '';
+        }
+        $key = (int)$businessDays === 1
+            ? 'LLL:EXT:products_shipping_ups/Resources/Private/Language/locallang.xlf:deliveryEstimate.businessDay'
+            : 'LLL:EXT:products_shipping_ups/Resources/Private/Language/locallang.xlf:deliveryEstimate.businessDays';
+        return (string)(LocalizationUtility::translate($key, null, [(int)$businessDays]) ?? $businessDays);
     }
 }

@@ -5,12 +5,13 @@ declare(strict_types=1);
 namespace GoldeneZeiten\Products\Shipping\Ups\Rating;
 
 use GoldeneZeiten\Products\Core\Domain\Dto\Shipping\ShippingContext;
+use GoldeneZeiten\Products\Core\Domain\ValueObject\Money;
 use GoldeneZeiten\Products\Shipping\Ups\Configuration\UpsConfiguration;
 
 /**
  * Builds the UPS "Shop" rate-request payload (the array serialised to RateRequest JSON) from the basket
- * context and the resolved configuration. Weight-only, postal-code + country: enough for a quote, and all
- * the shop knows. Integrators needing dimensions or multi-package splits add them via
+ * context and the resolved configuration. Weight, declared value, postal-code + country: enough for a
+ * quote, and all the shop knows. Integrators needing dimensions or multi-package splits add them via
  * {@see \GoldeneZeiten\Products\Shipping\Ups\Event\ModifyUpsRateRequestEvent}.
  */
 final class UpsRateRequestBuilder
@@ -71,7 +72,7 @@ final class UpsRateRequestBuilder
      */
     private function package(ShippingContext $context, UpsConfiguration $configuration): array
     {
-        return [
+        $package = [
             'PackagingType' => [
                 'Code' => self::PACKAGING_TYPE_CODE,
                 'Description' => 'Package',
@@ -81,9 +82,19 @@ final class UpsRateRequestBuilder
                     'Code' => $configuration->weightUnit,
                     'Description' => $configuration->weightUnit === 'LBS' ? 'Pounds' : 'Kilograms',
                 ],
-                'Weight' => $this->weight($context->getTotalWeight(), $configuration->weightUnit),
+                'Weight' => $this->weight($context->getTotalWeight() ?: $configuration->defaultPackageWeight, $configuration->weightUnit),
             ],
         ];
+        if ($configuration->declaredValueLimit > 0) {
+            $package['PackageServiceOptions'] = [
+                'DeclaredValue' => [
+                    'CurrencyCode' => $context->getCurrency(),
+                    'MonetaryValue' => Money::fromCents(min($context->getGoodsTotal()->getCents(), $configuration->declaredValueLimit))->getDecimalString(),
+                ],
+            ];
+        }
+
+        return $package;
     }
 
     private function weight(int $grams, string $unit): string

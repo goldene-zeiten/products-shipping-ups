@@ -51,6 +51,30 @@
 			<trans-unit id="setting.apiBaseUrl.description" resname="setting.apiBaseUrl.description">
 				<source>Send the UPS calls to this host instead of the real UPS host, e.g. a proxy or a local mock server. Leave empty to use the environment's real host.</source>
 			</trans-unit>
+			<trans-unit id="setting.defaultPackageWeight" resname="setting.defaultPackageWeight">
+				<source>Default package weight (g)</source>
+			</trans-unit>
+			<trans-unit id="setting.defaultPackageWeight.description" resname="setting.defaultPackageWeight.description">
+				<source>Grams sent to UPS for a basket whose products carry no weight, e.g. the shipping box and packaging. 0 sends the UPS minimum of 0.1 kg.</source>
+			</trans-unit>
+			<trans-unit id="setting.declaredValueLimit" resname="setting.declaredValueLimit">
+				<source>Declared value limit</source>
+			</trans-unit>
+			<trans-unit id="setting.declaredValueLimit.description" resname="setting.declaredValueLimit.description">
+				<source>Declares the goods value for UPS insurance, up to this amount (e.g. "10000"). Leave empty to declare no value.</source>
+			</trans-unit>
+			<trans-unit id="setting.freeServices" resname="setting.freeServices">
+				<source>Free service codes</source>
+			</trans-unit>
+			<trans-unit id="setting.freeServices.description" resname="setting.freeServices.description">
+				<source>Comma-separated UPS service codes the customer is not charged for, e.g. "11". UPS is still asked for the rate.</source>
+			</trans-unit>
+			<trans-unit id="setting.freeShippingThreshold" resname="setting.freeShippingThreshold">
+				<source>Free shipping from goods value</source>
+			</trans-unit>
+			<trans-unit id="setting.freeShippingThreshold.description" resname="setting.freeShippingThreshold.description">
+				<source>Goods value from which the free services cost nothing, e.g. "100". Leave empty to ship them free for every basket.</source>
+			</trans-unit>
 		</body>
 	</file>
 </xliff>

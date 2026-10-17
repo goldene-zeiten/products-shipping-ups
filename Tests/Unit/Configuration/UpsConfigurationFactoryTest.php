@@ -104,6 +104,33 @@ final class UpsConfigurationFactoryTest extends UnitTestCase
         $this->assertSame('https://wwwcie.ups.com', $default->baseUrl());
     }
 
+    #[Test]
+    public function packageAndPriceSettingsAreParsed(): void
+    {
+        $configuration = $this->factory([
+            'defaultPackageWeight' => '500',
+            'declaredValueLimit' => '10000',
+            'freeServices' => '11, 65',
+            'freeShippingThreshold' => '150.50',
+        ] + self::EXTENSION_DEFAULTS)->forSite(null);
+
+        $this->assertSame(500, $configuration->defaultPackageWeight);
+        $this->assertSame(1000000, $configuration->declaredValueLimit);
+        $this->assertSame(['11', '65'], $configuration->freeServices);
+        $this->assertSame(15050, $configuration->freeShippingThreshold);
+    }
+
+    #[Test]
+    public function packageAndPriceSettingsDefaultToOff(): void
+    {
+        $configuration = $this->factory(self::EXTENSION_DEFAULTS)->forSite(null);
+
+        $this->assertSame(0, $configuration->defaultPackageWeight);
+        $this->assertSame(0, $configuration->declaredValueLimit);
+        $this->assertSame([], $configuration->freeServices);
+        $this->assertSame(0, $configuration->freeShippingThreshold);
+    }
+
     /**
      * @param array<string, string> $extensionConfiguration
      */

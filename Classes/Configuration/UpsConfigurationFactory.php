@@ -6,6 +6,7 @@ namespace GoldeneZeiten\Products\Shipping\Ups\Configuration;
 
 use GoldeneZeiten\Products\ApiClient\Configuration\ApiSettingsResolver;
 use GoldeneZeiten\Products\ApiClient\Configuration\CurrentSiteResolver;
+use GoldeneZeiten\Products\Core\Domain\ValueObject\Money;
 use TYPO3\CMS\Core\Site\Entity\Site;
 
 /**
@@ -31,6 +32,10 @@ final readonly class UpsConfigurationFactory
         'usedServices',
         'weightUnit',
         'apiBaseUrl',
+        'defaultPackageWeight',
+        'declaredValueLimit',
+        'freeServices',
+        'freeShippingThreshold',
     ];
 
     public function __construct(
@@ -58,6 +63,10 @@ final readonly class UpsConfigurationFactory
             weightUnit: strtoupper($value['weightUnit']) === 'LBS' ? 'LBS' : 'KGS',
             usedServices: $this->parseServices($value['usedServices']),
             apiBaseUrl: rtrim($value['apiBaseUrl'], '/'),
+            defaultPackageWeight: max(0, (int)$value['defaultPackageWeight']),
+            declaredValueLimit: max(0, Money::fromDecimalString($value['declaredValueLimit'])->getCents()),
+            freeServices: $this->parseServices($value['freeServices']),
+            freeShippingThreshold: max(0, Money::fromDecimalString($value['freeShippingThreshold'])->getCents()),
         );
     }
 
